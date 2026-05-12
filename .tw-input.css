@@ -193,10 +193,11 @@
         .solution-card ul { opacity: .9; }
 
         /* Product card */
+        /* === PRODUCT SHOWCASE — mobile-first responsive premium === */
         .product-showcase { @apply grid grid-cols-2 items-center mx-auto; gap: 64px; max-width: 1060px; }
         .product-img {
-          @apply rounded-lg overflow-hidden relative flex items-center justify-center bg-surface-2;
-          aspect-ratio: 3/2;          /* matches source image (2528×1613 = 1.567) → no letterbox */
+          @apply rounded-lg overflow-hidden relative bg-surface-2;
+          aspect-ratio: 3/2;          /* desktop: matches source image (1.567) */
           width: 100%;
           min-height: 0;
           height: auto;
@@ -210,32 +211,52 @@
           transition: transform .6s cubic-bezier(.16,1,.3,1), filter .6s ease;
         }
         .product-img:hover { transform: scale(1.02) translateZ(0); filter: saturate(1.14) contrast(1.05) brightness(1.02); }
-        /* Badge: prominent gold gradient + glow ring — designed to grab attention especially on mobile/tablet */
+
+        /* Badge — pill-shaped, gold gradient. Stays INSIDE image bounds with safe inset. */
         .product-img-badge {
-          @apply absolute text-white font-semibold uppercase rounded-sharp inline-flex items-center gap-2;
-          top: 18px;
-          left: 18px;
+          position: absolute;
+          top: 16px;
+          left: 16px;
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          color: var(--color-white);
+          font-family: var(--font-sans);
+          font-weight: 600;
           font-size: 11px;
-          padding: 9px 18px;
-          letter-spacing: 2.5px;
-          background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 60%, var(--color-gold-pale) 100%);
-          box-shadow: 0 6px 22px rgba(217,119,6,.45), 0 0 0 1px rgba(255,255,255,.18) inset;
-          backdrop-filter: blur(10px);
+          line-height: 1;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          padding: 8px 14px;
+          max-width: calc(100% - 32px);     /* never overflow image — 2× inset */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 55%, var(--color-gold-pale) 100%);
+          border-radius: 100px;              /* premium pill, was sharp 3px */
+          box-shadow: 0 4px 16px rgba(217,119,6,.34), 0 0 0 1px rgba(255,255,255,.18) inset;
           z-index: 4;
-          animation: badgePulse 2.8s cubic-bezier(.4,0,.2,1) infinite;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          animation: badgePulse 3s cubic-bezier(.4,0,.2,1) infinite;
         }
         .product-img-badge::before {
           content: '';
-          width: 6px;
-          height: 6px;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
-          background: #fff;
-          box-shadow: 0 0 0 3px rgba(255,255,255,.35);
+          background: var(--color-white);
+          box-shadow: 0 0 0 2.5px rgba(255,255,255,.35);
+          flex-shrink: 0;
         }
+
+        /* Softer pulse — glow stays inside or close to image bounds */
         @keyframes badgePulse {
-          0%, 100% { box-shadow: 0 6px 22px rgba(217,119,6,.45), 0 0 0 1px rgba(255,255,255,.18) inset, 0 0 0 0 rgba(217,119,6,.55); }
-          50%      { box-shadow: 0 6px 22px rgba(217,119,6,.55), 0 0 0 1px rgba(255,255,255,.22) inset, 0 0 0 10px rgba(217,119,6,0); }
+          0%, 100% { box-shadow: 0 4px 16px rgba(217,119,6,.34), 0 0 0 1px rgba(255,255,255,.18) inset, 0 0 0 0 rgba(217,119,6,.40); }
+          50%      { box-shadow: 0 4px 16px rgba(217,119,6,.42), 0 0 0 1px rgba(255,255,255,.22) inset, 0 0 0 7px rgba(217,119,6,0); }
         }
+
+        /* (Product-card WhatsApp overlay removed — relying on global .wa-float and form CTAs) */
         .product-body .prod-brand { @apply text-[10px] font-medium uppercase text-gold; letter-spacing: 4px; margin-bottom: 10px; }
         .product-body h3 { @apply font-serif font-normal text-forest; font-size: 34px; margin-bottom: 18px; }
         .product-body h3 em { @apply text-gold-pale; }
@@ -893,9 +914,11 @@
           .steps-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
           .step-arrow { display: none; }
           .problem-grid { grid-template-columns: 1fr; }
-          .product-showcase { grid-template-columns: 1fr; max-width: 600px; }
-          /* Tablet: product-img aspect-ratio handles sizing — only tune the badge */
-          .product-img-badge { font-size: 12px; padding: 10px 22px; top: 22px; left: 22px; letter-spacing: 2.5px; }
+          /* Tablet (≤1024px): stacked layout, slightly more portrait aspect, compact badge */
+          .product-showcase { grid-template-columns: 1fr; max-width: 560px; gap: 32px; }
+          .product-img { aspect-ratio: 5/4; }       /* tablet: slight portrait for better presence */
+          .product-img-badge { font-size: 10.5px; padding: 7px 14px; top: 14px; left: 14px; letter-spacing: 1.8px; gap: 6px; max-width: calc(100% - 28px); }
+          .product-img-badge::before { width: 4.5px; height: 4.5px; box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
           .constraints-grid { grid-template-columns: repeat(2, 1fr); }
           .form-inner { gap: 48px; }
           .trust-inner { flex-wrap: wrap; gap: 20px; }
@@ -948,15 +971,31 @@
           .problem-card, .solution-card { padding: 24px 20px; border-radius: var(--radius-lg); }
           .problem-card h3, .solution-card h3 { font-size: 14px; gap: 8px; }
           .problem-card ul, .solution-card ul { font-size: 12px; line-height: 2; }
-          .product-showcase { grid-template-columns: 1fr; gap: 28px; }
-          /* Mobile: product-img aspect-ratio handles sizing — only tune the badge */
-          .product-img { border-radius: var(--radius-lg); }
-          .product-img-badge { font-size: 12px; padding: 10px 20px; top: 16px; left: 16px; letter-spacing: 2px; }
-          .product-body h3 { font-size: 26px; margin-bottom: 12px; }
-          .product-body > p { font-size: 13px; margin-bottom: 20px; }
-          .product-specs { font-size: 12px; line-height: 2.2; }
-          .product-cta { margin-top: 24px; }
-          .product-cta .btn { width: 100%; justify-content: center; }
+          /* Mobile (≤768px): single column, 1:1 luxury card aspect, compact overlays */
+          .product-showcase { grid-template-columns: 1fr; gap: 28px; max-width: 480px; padding: 0 2px; }
+          .product-img {
+            aspect-ratio: 1/1;                 /* premium square — luxury e-commerce standard */
+            border-radius: 16px;
+            box-shadow: 0 14px 36px rgba(20,83,45,.10), 0 4px 10px rgba(0,0,0,.05);
+          }
+          .product-img-badge {
+            top: 12px;
+            left: 12px;
+            font-size: 10px;
+            padding: 7px 12px;
+            letter-spacing: 1.6px;
+            gap: 6px;
+            max-width: calc(100% - 24px);
+          }
+          .product-img-badge::before { width: 4px; height: 4px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.35); }
+          .product-body { padding: 0 2px; }
+          .product-body .prod-brand { font-size: 9.5px; letter-spacing: 3px; margin-bottom: 8px; }
+          .product-body h3 { font-size: 25px; line-height: 1.18; margin-bottom: 12px; }
+          .product-body > p { font-size: 13.5px; line-height: 1.75; margin-bottom: 18px; }
+          .product-specs { font-size: 12.5px; line-height: 2; }
+          .product-specs li { gap: 12px; }
+          .product-cta { margin-top: 24px; padding-bottom: 4px; }
+          .product-cta .btn { width: 100%; justify-content: center; min-height: 50px; padding: 16px 22px; }
           .constraints-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
           .constraint-cell { padding: 22px 18px; border-radius: var(--radius-lg); }
           .constraint-icon { width: 40px; height: 40px; margin-bottom: 14px; }
@@ -1094,11 +1133,30 @@
           .feat h3 { font-size: 14px; margin-bottom: 0; line-height: 1.25; }
           .feat p { font-size: 12px; line-height: 1.6; }
 
-          /* Product card */
-          .product-showcase { gap: 22px; }
-          .product-body h3 { font-size: 24px; margin-bottom: 10px; line-height: 1.15; }
+          /* Product card — iPhone 375/390/414 tuning. Image becomes the hero. */
+          .product-showcase { gap: 22px; max-width: 100%; padding: 0; }
+          .product-img { border-radius: 14px; aspect-ratio: 1/1; }
+          .product-img-badge {
+            top: 10px;
+            left: 10px;
+            font-size: 9.5px;
+            padding: 6px 11px;
+            letter-spacing: 1.4px;
+            gap: 5px;
+            max-width: calc(100% - 20px);
+            /* Pulse disabled to keep visual calm — WA button gets the pulse instead */
+            animation: none;
+            box-shadow: 0 3px 12px rgba(217,119,6,.32), 0 0 0 1px rgba(255,255,255,.18) inset;
+          }
+          .product-img-badge::before { width: 3.5px; height: 3.5px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.4); }
+          .product-body { padding: 0; }
+          .product-body .prod-brand { font-size: 9px; letter-spacing: 2.5px; margin-bottom: 6px; }
+          .product-body h3 { font-size: 23px; margin-bottom: 10px; line-height: 1.15; }
           .product-body > p { font-size: 13px; line-height: 1.7; margin-bottom: 16px; }
           .product-specs { font-size: 12.5px; line-height: 2; }
+          .product-specs li { gap: 10px; }
+          .product-cta { margin-top: 20px; padding-bottom: 12px; }   /* safety zone below CTA so WA float doesn't visually pinch */
+          .product-cta .btn { padding: 15px 20px; font-size: 12px; }
 
           /* Form — tighter padding so the card doesn't overflow at 375px */
           .form-inner { gap: 24px; }
