@@ -48,7 +48,42 @@ app.use(express.urlencoded({ extended: false }));
 // Trust Railway proxy for correct req.ip
 app.set("trust proxy", 1);
 
-app.use(express.static(path.join(__dirname), { index: "index.html" }));
+// Disable Express signature header (Best Practices: don't leak server info)
+app.disable("x-powered-by");
+
+// Security + privacy headers (helmet-like, dependency-free)
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
+  res.setHeader("X-DNS-Prefetch-Control", "on");
+  // HSTS (only meaningful over HTTPS — Railway terminates SSL)
+  if (req.secure || req.headers["x-forwarded-proto"] === "https") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
+
+// Static assets with aggressive caching (Performance)
+app.use(
+  express.static(path.join(__dirname), {
+    index: "index.html",
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+      // Long cache for binary/immutable assets
+      if (/\.(jpg|jpeg|png|webp|svg|gif|ico|woff|woff2|ttf|otf)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "public, max-age=2592000, immutable"); // 30 days
+      } else if (/\.(css|js)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day
+      } else if (filePath.endsWith(".html")) {
+        // HTML: short cache, revalidate quickly (so CRO tweaks ship fast)
+        res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=86400");
+      }
+    },
+  })
+);
 
 // ── Odoo JSON-RPC helpers ──
 

@@ -4,3 +4,6 @@ node_modules/
 
 desktop.ini
 Thumbs.db
+
+# Tailwind compile artifacts (CSS is inlined in index.html)
+.tw-output.css
